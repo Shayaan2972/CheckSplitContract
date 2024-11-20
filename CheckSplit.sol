@@ -7,13 +7,12 @@ interface ICheckSpiltter{
 
     /// @dev Emitted when the bill is split among participants.
     /// @param totalAmount The total Ether amount to be split.
-    /// @param numParticipants The number of participants involved.
-    /// @param perParticipant The amount allocated to each participant.
+    /// @param Participants is an array of the participant's addresses.
+    /// @param Shares is an array of the percentages of what each participant owes and can be either all the same or custom. 
     event EtherSplit(
-        unint256 totalAmount,
+        uint256 totalAmount,
         address [] participants,
         uint256 [] shares,
-        String splitType
     );
 
     /// @dev Emitted when a participant withdraws an amount.
