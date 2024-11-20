@@ -1,6 +1,6 @@
-#Check Split Contract
+# Check Split Contract
 
-##Purpose
+## Purpose
 
 This **Check Spliter Contract** is designed to split a bill among multiple people using Ethereum. It eliminates any hustle and allows for a quick and transparent deal. This contract allows:
 
