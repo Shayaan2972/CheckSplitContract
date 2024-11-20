@@ -12,7 +12,7 @@ This **Check Spliter Contract** is designed to split a bill among multiple peopl
 
 This contract is ideal for people at restaturants, on trips, and events where quick, simple, efficent and trasnparent way is needed to handle splitting the bill.
 
-#Group Members
+# Group Members
 | Name           | GitHub Handle       | Email Address        |
 |----------------|---------------------|----------------------|
 | Shayaan Mohammed | @Shayaan2972     | Shayaanuddin.Mohammed45@myhunter.cuny.edu |
