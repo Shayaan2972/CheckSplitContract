@@ -10,9 +10,10 @@ interface ICheckSpiltter{
     /// @param numParticipants The number of participants involved.
     /// @param perParticipant The amount allocated to each participant.
     event EtherSplit(
-        uint256 totalAmount,
-        uint256 numParticipants,
-        uint256 perParticipant
+        unint256 totalAmount,
+        address [] participants,
+        uint256 [] shares,
+        String splitType
     );
 
     /// @dev Emitted when a participant withdraws an amount.
