@@ -21,3 +21,45 @@ This contract is ideal for people at restaturants, on trips, and events where qu
 | Edison Freire    | @  | edisonfreire49@myhunter.cuny.edu|
 | Karim Elshabassy | @KarimE146   | karim.elshabassy53@myhunter.cuny.edu |
 
+## Events
+
+**ContributionMade**
+- Shows when someone pays their share
+- Records:
+ - Who paid (by address)
+ - How much they paid
+
+**EtherSplit**
+- Shows when bill is first divided
+- Records:
+ - Total bill amount
+ - Number of people splitting
+ - Cost per person
+
+**Withdrawal**
+- Shows when someone takes out money
+- Records:
+ - Who withdrew (by address)
+ - How much they took out
+
+## Functions
+
+**registerParticipant**
+- Adds someone to the bill split
+- Parameters: Their address
+
+**initializeBill**
+- Starts a new bill
+- Parameters: Total bill amount
+
+**withdraw**
+- Takes out your share
+- Parameters: Amount to withdraw
+
+**contribute**
+- Pays your share
+- Parameters: Amount to pay
+
+**transferRemaining**
+- Sends leftover money to owner
+- Parameters: None
