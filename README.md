@@ -70,16 +70,16 @@ This contract is ideal for people at restaturants, on trips, and events where qu
 - Call the registerParticipant function for each participant.
 
 **Initialize the Bill**
--Call the initializeBill function to specify the total bill amount.
--This will trigger the event EtherSplit to show how the bill was divided.
+- Call the initializeBill function to specify the total bill amount.
+- This will trigger the event EtherSplit to show how the bill was divided.
 
 **Contribute**
--Each participant pays their share using the contribute function.
--This will trigger the event ontributionMade with the participant's address and payment amount.
+- Each participant pays their share using the contribute function.
+- This will trigger the event ontributionMade with the participant's address and payment amount.
 
 **Withdraw (If needed)**
--If a participant wants to take back some of their contribution, they can call the withdraw function.
--Triggers the event Withdrawal with the participant's address and the amount withdrawn.
+- If a participant wants to take back some of their contribution, they can call the withdraw function.
+- Triggers the event Withdrawal with the participant's address and the amount withdrawn.
 
 **Transfer Remaining**
--The owner gets the money once the bill is finalized.
+- The owner gets the money once the bill is finalized.
