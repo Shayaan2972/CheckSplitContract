@@ -18,11 +18,9 @@ interface ICheckSpiltter{
     /// @dev Emitted when a participant withdraws an amount.
     /// @param participant The address of the participant who is withdrawing.
     /// @param amountWithdrawn The amount withdrawn.
-    /// @param percentage The percentage of the total amount withdrawn.
     event Withdrawal(
         address indexed participant, 
-        uint256 amountWithdrawn, 
-        uint256 percentage
+        uint256 amountWithdrawn 
     );
 
     /// @dev Emitted when a participant contibutes an amount.
@@ -41,13 +39,13 @@ interface ICheckSpiltter{
     /// @param amount The total amount of the bill.    
     function initializeBill(uint256 amount) external;
 
-    /// @dev Allows a participant to withdraw their share.
+    /// @dev Allows a participant to withdraw an amount.
     function withdraw(uint256 amount) external; 
 
     /// @dev Allows a participant to contribute to the total.
     function contribute(uint256 amount) external; 
 
-    /// @dev Allows a participant to see how much they have left to withdraw from their share.
-    function withdrawalAmountRemaining() external view returns (uint256 amount);
+    /// @dev Transfer remaining balance to the owner after bill is finalized.
+    function transferRemaining () external;
 
 };
