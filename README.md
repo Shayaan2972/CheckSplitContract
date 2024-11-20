@@ -26,21 +26,21 @@ This contract is ideal for people at restaturants, on trips, and events where qu
 **ContributionMade**
 - Shows when someone pays their share
 - Records:
- - Who paid (by address)
- - How much they paid
+  - Who paid (by address)
+  - How much they paid
 
 **EtherSplit**
 - Shows when bill is first divided
 - Records:
- - Total bill amount
- - Number of people splitting
- - Cost per person
+  - Total bill amount
+  - Number of people splitting
+  - Cost per person
 
 **Withdrawal**
 - Shows when someone takes out money
 - Records:
- - Who withdrew (by address)
- - How much they took out
+  - Who withdrew (by address)
+  - How much they took out
 
 ## Functions
 
