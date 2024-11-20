@@ -18,7 +18,7 @@ This contract is ideal for people at restaturants, on trips, and events where qu
 | Shayaan Mohammed | @Shayaan2972     | Shayaanuddin.Mohammed45@myhunter.cuny.edu |
 | Abdullah Al Razee| @   |  |
 | Marwan Kabir     | @MarwanKabir     | marwan.kabir06@myhunter.cuny.edu |
-| Edison Freire    | @  | edisonfreire49@myhunter.cuny.edu|
+| Edison Freire    | @edisonfreire  | edisonfreire49@myhunter.cuny.edu |
 | Karim Elshabassy | @KarimE146   | karim.elshabassy53@myhunter.cuny.edu |
 
 ## Events
