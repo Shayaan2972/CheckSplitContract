@@ -13,13 +13,13 @@ This **Check Spliter Contract** is designed to split a bill among multiple peopl
 This contract is ideal for people at restaturants, on trips, and events where quick, simple, efficent and trasnparent way is needed to handle splitting the bill.
 
 # Group Members
-| Name           | GitHub Handle       | Email Address        |
-|----------------|---------------------|----------------------|
+| Name             | GitHub Handle    | Email Address                             |
+|------------------|------------------|-------------------------------------------|
 | Shayaan Mohammed | @Shayaan2972     | Shayaanuddin.Mohammed45@myhunter.cuny.edu |
-| Abdullah Al Razee| @   |  |
-| Marwan Kabir     | @MarwanKabir     | marwan.kabir06@myhunter.cuny.edu |
-| Edison Freire    | @edisonfreire  | edisonfreire49@myhunter.cuny.edu |
-| Karim Elshabassy | @KarimE146   | karim.elshabassy53@myhunter.cuny.edu |
+| Abdullah Razee   | @razee3          | abdullah.razee05@myhunter.cuny.edu        |
+| Marwan Kabir     | @MarwanKabir     | marwan.kabir06@myhunter.cuny.edu          |
+| Edison Freire    | @edisonfreire    | edisonfreire49@myhunter.cuny.edu          |
+| Karim Elshabassy | @KarimE146       | karim.elshabassy53@myhunter.cuny.edu      |
 
 ## Events
 
