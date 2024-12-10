@@ -5,39 +5,69 @@ import "./ICheckSplitter.sol";
 
 /// @title Check Splitting Contract
 /// @Splits a bill among participants
+contract CheckSplitter is ICheckSplitter {
+    address public owner = msg.sender;
+    address[] public participants;
+    mapping(address => bool) public isParticipant;
+    mapping(address => uint256) public shares;
+    uint256 public totalBill;
+    bool public billInitialized;
 
-contract CheckSplitter is ICheckSplitter{
+    /// @notice Restricts access to the contract owner.
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the owner can call this function.");
+        _;
+    }
 
-address public owner = msg.sender;
-address[] public participant;
-mapping(address => bool) public isParticipant;
-mapping (address => uint256) public shares;
-uint256 public totalBill;
+    /// @notice Ensures only registered participants can call certain functions.
+    modifier onlyParticipant() {
+        require(isParticipant[msg.sender], "You are not a registered participant.");
+        _;
+    }
 
+    // @inheritdoc ICheckSplitter
+    function registerParticipant(address participant) external override onlyOwner {
+        require(!isParticipant[participant], "Participant already registered.");
+        require(participant != address(0), "Invalid participant address.");
 
-// @inheritdoc ICheckSplitter 
-function registerParticipant() external payable override {
+        participants.push(participant);
+        isParticipant[participant] = true;
+    }
 
-require(msg.sender == owner, "Only the owner can register participants.");
-require(shares[participant], "Participant already registered.");
+    function initializeBill(uint256 amount) external override onlyOwner {
+        require(!billInitialized, "Bill already initialized.");
+        require(amount > 0, "Bill amount must be greater than 0.");
 
-participants.push(participant);
-isParticipant[participant] = true;
+        totalBill = amount;
+        billInitialized = true;
+    }
 
-}
+    /// @inheritdoc ICheckSplitter
+    function withdraw(uint256 amount) external override onlyParticipant {
+        require(amount > 0, "Withdrawal amount must be greater than 0.");
+        require(shares[msg.sender] >= amount, "Insufficient balance to withdraw.");
 
-function initializeBill(uint256 amount) external{
-    require(msg.sender == owner, "Only the owner can initiliaze the bill.");
-    require(!billInitalized, "Participant already registered.");
-    require(amount > 0, "Bill amount must be greater than 0.");
-    
-    totalBill = amount;
-    billInitalized = true;
+        shares[msg.sender] -= amount;
+        payable(msg.sender).transfer(amount);
 
-}
+        emit Withdrawal(msg.sender, amount);
+    }
 
+    // Placeholder for `contribute` function 
+    // function contribute(uint256 amount) external payable override {
+    // 
+    // }
 
+    // Placeholder for `transferRemaining` function 
+    // function transferRemaining() external override onlyOwner {
+    // 
+    // }
 
+    // Placeholder for other teammate functionality
+    // function <other teammate function>() external override {
+    //
+    // }
 
-
+    /// @dev Allows the contract to receive Ether payments.
+    receive() external payable {}
 }
