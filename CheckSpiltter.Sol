@@ -64,7 +64,7 @@ contract CheckSplitter is ICheckSplitter {
     // }
 
     // Placeholder for other teammate functionality
-    // function <other teammate function>() external override {
+    // function getParticipantDetails(address participant) {
     //
     // }
 
