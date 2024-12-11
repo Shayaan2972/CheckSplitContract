@@ -87,4 +87,17 @@ contract("CheckSplitter", (accounts) => {
     }
   });
 
+  it("should allow participant to contribute", async () => {
+    await checkSplitter.registerParticipant(participant1, { from: owner });
+    await checkSplitter.initializeBill(oneEth, { from: owner });
+    
+    await checkSplitter.contribute(halfEth, { 
+      from: participant1, 
+      value: halfEth 
+    });
+    
+    const details = await checkSplitter.getParticipantDetails(participant1);
+    assert.equal(details.amountPaid.toString(), halfEth, "Contribution amount incorrect");
+  });
+
 });
