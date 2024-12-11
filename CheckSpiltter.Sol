@@ -75,10 +75,35 @@ contract CheckSplitter is ICheckSplitter {
         emit ContributionMade(msg.sender, amount);
     }
 
-    // Placeholder for `transferRemaining` function 
-    // function transferRemaining() external override onlyOwner {
-    // 
-    // }
+    // @inheritdoc ICheckSplitter
+    function transferRemaining() external override onlyOwner {
+        require(billInitialized, "Bill has not been initialized.");
+
+        // Calculate the share per participant
+        uint256 sharePerPerson = totalBill / participants.length;
+
+        // Verify all participants have contributed their full share
+        for (uint256 i = 0; i < participants.length; i++) {
+            address participant = participants[i];
+            require(
+                shares[participant] >= sharePerPerson,
+                "Not all participants have paid their share."
+            );
+        }
+
+        // Get the remaining contract balance
+        uint256 contractBalance = address(this).balance;
+
+        // Ensure there is a remaining balance to transfer
+        require(contractBalance > 0, "No remaining balance to transfer.");
+
+        // Transfer the remaining balance to the owner
+        payable(owner).transfer(contractBalance);
+
+        // Emit the transfer event
+        emit RemainingBalanceTransferred(owner, contractBalance);
+    }
+
 
     // Placeholder for other teammate functionality
     // function getParticipantDetails(address participant) {
