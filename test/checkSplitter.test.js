@@ -87,6 +87,7 @@ contract("CheckSplitter", (accounts) => {
     }
   });
 
+  // contribution general tests
   it("should allow participant to contribute", async () => {
     await checkSplitter.registerParticipant(participant1, { from: owner });
     await checkSplitter.initializeBill(oneEth, { from: owner });
@@ -98,6 +99,136 @@ contract("CheckSplitter", (accounts) => {
     
     const details = await checkSplitter.getParticipantDetails(participant1);
     assert.equal(details.amountPaid.toString(), halfEth, "Contribution amount incorrect");
+  });
+
+  it("should allow multiple participants to contribute", async () => {
+    await checkSplitter.registerParticipant(participant1, { from: owner });
+    await checkSplitter.registerParticipant(participant2, { from: owner });
+    await checkSplitter.initializeBill(oneEth, { from: owner });
+  
+    await checkSplitter.contribute(halfEth, { 
+      from: participant1, 
+      value: halfEth 
+    });
+    await checkSplitter.contribute(halfEth, { 
+      from: participant2, 
+      value: halfEth 
+    });
+  
+    const details1 = await checkSplitter.getParticipantDetails(participant1);
+    const details2 = await checkSplitter.getParticipantDetails(participant2);
+  
+    assert.equal(details1.amountPaid.toString(), halfEth, "Participant 1 contribution incorrect");
+    assert.equal(details2.amountPaid.toString(), halfEth, "Participant 2 contribution incorrect");
+  });
+  
+  it("should allow partial contributions by a participant", async () => {
+    await checkSplitter.registerParticipant(participant1, { from: owner });
+    await checkSplitter.initializeBill(oneEth, { from: owner });
+  
+    await checkSplitter.contribute(halfEth, { 
+      from: participant1, 
+      value: halfEth 
+    });
+    await checkSplitter.contribute(halfEth, { 
+      from: participant1, 
+      value: halfEth 
+    });
+  
+    const details = await checkSplitter.getParticipantDetails(participant1);
+    assert.equal(details.amountPaid.toString(), oneEth, "Total contribution incorrect");
+  });
+  
+  it("should allow a participant to contribute their exact share", async () => {
+    await checkSplitter.registerParticipant(participant1, { from: owner });
+    await checkSplitter.registerParticipant(participant2, { from: owner });
+    await checkSplitter.initializeBill(oneEth, { from: owner });
+  
+    const sharePerParticipant = oneEth / 2;
+    await checkSplitter.contribute(sharePerParticipant.toString(), { 
+      from: participant1, 
+      value: sharePerParticipant.toString() 
+    });
+  
+    const details = await checkSplitter.getParticipantDetails(participant1);
+    assert.equal(details.amountPaid.toString(), sharePerParticipant, "Contribution does not match exact share");
+  });
+  
+  it("should correctly track remaining contract balance after contributions", async () => {
+    await checkSplitter.registerParticipant(participant1, { from: owner });
+    await checkSplitter.registerParticipant(participant2, { from: owner });
+    await checkSplitter.initializeBill(oneEth, { from: owner });
+  
+    await checkSplitter.contribute(halfEth, { 
+      from: participant1, 
+      value: halfEth 
+    });
+    await checkSplitter.contribute(halfEth, { 
+      from: participant2, 
+      value: halfEth 
+    });
+  
+    const contractBalance = await web3.eth.getBalance(checkSplitter.address);
+    assert.equal(contractBalance.toString(), oneEth, "Contract balance incorrect after contributions");
+  });
+
+  // contribution edge case tests
+  it("should not allow non-participant to contribute", async () => {
+    try {
+      await checkSplitter.contribute(oneEth, { from: participant1, value: oneEth });
+      assert.fail("Should have thrown an error");
+    } catch (error) {
+      assert.include(error.message, "You are not a registered participant");
+    }
+  });
+  
+  it("should not allow contribution before bill is initialized", async () => {
+    await checkSplitter.registerParticipant(participant1, { from: owner });
+  
+    try {
+      await checkSplitter.contribute(halfEth, { from: participant1, value: halfEth });
+      assert.fail("Should have thrown an error");
+    } catch (error) {
+      assert.include(error.message, "Bill has not been initialized yet");
+    }
+  });
+  
+  it("should not allow contribution of zero amount", async () => {
+    await checkSplitter.registerParticipant(participant1, { from: owner });
+    await checkSplitter.initializeBill(oneEth, { from: owner });
+  
+    try {
+      await checkSplitter.contribute(0, { from: participant1, value: 0 });
+      assert.fail("Should have thrown an error");
+    } catch (error) {
+      assert.include(error.message, "Contribution amount must be greater than 0");
+    }
+  });
+  
+  it("should not allow contribution more than allowed share", async () => {
+    await checkSplitter.registerParticipant(participant1, { from: owner });
+    await checkSplitter.registerParticipant(participant2, { from: owner });
+    await checkSplitter.initializeBill(oneEth, { from: owner });
+  
+    // Participant tries to contribute more than their share
+    try {
+      await checkSplitter.contribute(oneEth, { from: participant1, value: oneEth });
+      assert.fail("Should have thrown an error");
+    } catch (error) {
+      assert.include(error.message, "Cannot contribute more than your share");
+    }
+  });
+  
+  it("should not allow contribution if msg.value and amount do not match", async () => {
+    await checkSplitter.registerParticipant(participant1, { from: owner });
+    await checkSplitter.initializeBill(oneEth, { from: owner });
+  
+    try {
+      await checkSplitter.contribute(halfEth, { from: participant1, value: oneEth });
+      assert.fail("Should have thrown an error");
+    } catch (error) {
+      assert.include(error.message, "Sent value does not match declared amount");
+    }
   });
 
 });
