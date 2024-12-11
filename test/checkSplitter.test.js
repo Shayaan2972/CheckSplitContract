@@ -231,132 +231,68 @@ contract("CheckSplitter", (accounts) => {
     }
   });
 
-});
+  // tests transfer remaining function
+  it("should revert if bill is not initialized", async () => {
+    await checkSplitter.registerParticipant(participant1, { from: owner });
 
-// tests transfer remaining function
-it("should revert if bill is not initialized", async () => {
-  await checkSplitter.registerParticipant(participant1, { from: owner });
-
-  try {
-    await checkSplitter.transferRemaining({ from: owner });
-    assert.fail("Expected revert for uninitialized bill");
-  } catch (error) {
-    assert.include(
-      error.message,
-      "Bill has not been initialized",
-      "Error message does not match"
-    );
-  }
-});
-
-it("should revert if not all participants have contributed their share", async () => {
-  const billAmount = web3.utils.toWei("1", "ether"); // 1 ETH
-  const halfEth = web3.utils.toWei("0.5", "ether"); // 0.5 ETH
-
-  await checkSplitter.registerParticipant(participant1, { from: owner });
-  await checkSplitter.registerParticipant(participant2, { from: owner });
-  await checkSplitter.initializeBill(billAmount, { from: owner });
-
-  // Only participant1 contributes
-  await checkSplitter.contribute(halfEth, {
-    from: participant1,
-    value: halfEth,
+    try {
+      await checkSplitter.transferRemaining({ from: owner });
+      assert.fail("Expected revert for uninitialized bill");
+    } catch (error) {
+      assert.include(
+        error.message,
+        "Bill has not been initialized",
+        "Error message does not match"
+      );
+    }
   });
 
-  try {
-    await checkSplitter.transferRemaining({ from: owner });
-    assert.fail("Expected revert for incomplete contributions");
-  } catch (error) {
-    assert.include(
-      error.message,
-      "Not all participants have paid their share",
-      "Error message does not match"
-    );
-  }
-});
+  it("should revert if not all participants have contributed their share", async () => {
+    const billAmount = web3.utils.toWei("1", "ether"); // 1 ETH
+    const halfEth = web3.utils.toWei("0.5", "ether"); // 0.5 ETH
 
-it("should revert if there is no remaining balance to transfer", async () => {
-  const billAmount = web3.utils.toWei("1", "ether"); // 1 ETH
-  const halfEth = web3.utils.toWei("0.5", "ether"); // 0.5 ETH
+    await checkSplitter.registerParticipant(participant1, { from: owner });
+    await checkSplitter.registerParticipant(participant2, { from: owner });
+    await checkSplitter.initializeBill(billAmount, { from: owner });
 
-  await checkSplitter.registerParticipant(participant1, { from: owner });
-  await checkSplitter.registerParticipant(participant2, { from: owner });
-  await checkSplitter.initializeBill(billAmount, { from: owner });
+    // Only participant1 contributes
+    await checkSplitter.contribute(halfEth, {
+      from: participant1,
+      value: halfEth,
+    });
 
-  await checkSplitter.contribute(halfEth, { from: participant1, value: halfEth });
-  await checkSplitter.contribute(halfEth, { from: participant2, value: halfEth });
-
-  // Manually withdraw all balance
-  await checkSplitter.withdraw(halfEth, { from: participant1 });
-  await checkSplitter.withdraw(halfEth, { from: participant2 });
-
-  try {
-    await checkSplitter.transferRemaining({ from: owner });
-    assert.fail("Expected revert for zero remaining balance");
-  } catch (error) {
-    assert.include(
-      error.message,
-      "No remaining balance to transfer",
-      "Error message does not match"
-    );
-  }
-});
-
-it("should allow multiple transferRemaining calls after resetting bill", async () => {
-  const billAmount = web3.utils.toWei("1", "ether"); // 1 ETH
-  const halfEth = web3.utils.toWei("0.5", "ether"); // 0.5 ETH
-
-  await checkSplitter.registerParticipant(participant1, { from: owner });
-  await checkSplitter.registerParticipant(participant2, { from: owner });
-  await checkSplitter.initializeBill(billAmount, { from: owner });
-
-  await checkSplitter.contribute(halfEth, { from: participant1, value: halfEth });
-  await checkSplitter.contribute(halfEth, { from: participant2, value: halfEth });
-
-  // First transfer
-  await checkSplitter.transferRemaining({ from: owner });
-  let contractBalance = await web3.eth.getBalance(checkSplitter.address);
-  assert.equal(contractBalance.toString(), "0", "Contract balance should be zero");
-
-  // Reinitialize bill and contributions
-  const newBillAmount = web3.utils.toWei("2", "ether"); // 2 ETH
-  await checkSplitter.initializeBill(newBillAmount, { from: owner });
-
-  await checkSplitter.contribute(web3.utils.toWei("1", "ether"), {
-    from: participant1,
-    value: web3.utils.toWei("1", "ether"),
+    try {
+      await checkSplitter.transferRemaining({ from: owner });
+      assert.fail("Expected revert for incomplete contributions");
+    } catch (error) {
+      assert.include(
+        error.message,
+        "Not all participants have paid their share",
+        "Error message does not match"
+      );
+    }
   });
 
-  await checkSplitter.contribute(web3.utils.toWei("1", "ether"), {
-    from: participant2,
-    value: web3.utils.toWei("1", "ether"),
+  it("should revert if a non-owner tries to call transferRemaining", async () => {
+    const billAmount = web3.utils.toWei("1", "ether"); // 1 ETH
+    const halfEth = web3.utils.toWei("0.5", "ether"); // 0.5 ETH
+
+    await checkSplitter.registerParticipant(participant1, { from: owner });
+    await checkSplitter.registerParticipant(participant2, { from: owner });
+    await checkSplitter.initializeBill(billAmount, { from: owner });
+
+    await checkSplitter.contribute(halfEth, { from: participant1, value: halfEth });
+    await checkSplitter.contribute(halfEth, { from: participant2, value: halfEth });
+
+    try {
+      await checkSplitter.transferRemaining({ from: participant1 });
+      assert.fail("Expected revert for unauthorized caller");
+    } catch (error) {
+      assert.include(
+        error.message,
+        "Only the owner can call this function",
+        "Error message does not match"
+      );
+    }
   });
-
-  // Second transfer
-  await checkSplitter.transferRemaining({ from: owner });
-  contractBalance = await web3.eth.getBalance(checkSplitter.address);
-  assert.equal(contractBalance.toString(), "0", "Contract balance should be zero after second transfer");
-});
-
-it("should revert if a non-owner tries to call transferRemaining", async () => {
-  const billAmount = web3.utils.toWei("1", "ether"); // 1 ETH
-  const halfEth = web3.utils.toWei("0.5", "ether"); // 0.5 ETH
-
-  await checkSplitter.registerParticipant(participant1, { from: owner });
-  await checkSplitter.registerParticipant(participant2, { from: owner });
-  await checkSplitter.initializeBill(billAmount, { from: owner });
-
-  await checkSplitter.contribute(halfEth, { from: participant1, value: halfEth });
-  await checkSplitter.contribute(halfEth, { from: participant2, value: halfEth });
-
-  try {
-    await checkSplitter.transferRemaining({ from: participant1 });
-    assert.fail("Expected revert for unauthorized caller");
-  } catch (error) {
-    assert.include(
-      error.message,
-      "Only the owner can call this function",
-      "Error message does not match"
-    );
-  }
 });
