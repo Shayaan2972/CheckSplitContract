@@ -3,8 +3,6 @@ pragma solidity ^0.8.0;
 
 import "./ICheckSplitter.sol";
 
-/// @title Check Splitting Contract
-/// @Splits a bill among participants
 contract CheckSplitter is ICheckSplitter {
     address public owner = msg.sender;
     address[] public participants;
@@ -105,10 +103,23 @@ contract CheckSplitter is ICheckSplitter {
     }
 
 
-    // Placeholder for other teammate functionality
-    // function getParticipantDetails(address participant) {
-    //
-    // }
+    function getParticipantDetails(address participant) external view returns ( uint256 amountPaid, bool hasPaid, uint256 amountOwed)
+    {
+        require(isParticipant[participant], "Address is not a registered participant.");
+
+        // Gets the amount paid by the participants
+        amountPaid = shares[participant];
+
+        // Determine if they have made any payment
+        hasPaid = amountPaid > 0;
+
+        // Calculates the share per person depening on the total and amount of participants
+        uint256 sharePerPerson = totalBill / participants.length;
+        
+        amountOwed = sharePerPerson - amountPaid;
+ 
+    }
+
 
     /// @dev Allows the contract to receive Ether payments.
     receive() external payable {}
