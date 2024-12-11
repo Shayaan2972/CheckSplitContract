@@ -11,6 +11,8 @@ contract("CheckSplitter", (accounts) => {
   const oneEth = "1000000000000000000";  // 1 ETH in wei
   const halfEth = "500000000000000000";  // 0.5 ETH in wei
 
+  //Owner tests
+
   beforeEach(async () => {
     checkSplitter = await CheckSplitter.new({ from: owner });
   });
@@ -48,6 +50,8 @@ contract("CheckSplitter", (accounts) => {
 
   });
 
+  //registration tests
+
   it("should not allow duplicate registration of a participant", async () =>{
   // Reigster particpant
   await checkSplitter.registerParticipant(participant1, {from: owner });
@@ -70,6 +74,8 @@ contract("CheckSplitter", (accounts) => {
       assert.include(error.message, "Invalid participant address.")
     }
   });
+
+  //initialization tests
 
   it("should allow the owner to initialize bill", async () =>{
     // Try initializaing bill
@@ -103,6 +109,8 @@ contract("CheckSplitter", (accounts) => {
       assert.include(error.message, "Bill can not be initialized with 0 eth.")
     }
   });
+
+  //Withdrawl tests
 
   it("should allow participant to withdraw", async () => {
     await checkSplitter.registerParticipant(participant1, { from: owner });
@@ -154,6 +162,7 @@ contract("CheckSplitter", (accounts) => {
   });
 
   // contribution general tests
+
   it("should allow participant to contribute", async () => {
     await checkSplitter.registerParticipant(participant1, { from: owner });
     await checkSplitter.initializeBill(oneEth, { from: owner });
@@ -298,6 +307,7 @@ contract("CheckSplitter", (accounts) => {
   });
 
   // tests transfer remaining function
+
   it("should revert if bill is not initialized", async () => {
     await checkSplitter.registerParticipant(participant1, { from: owner });
 

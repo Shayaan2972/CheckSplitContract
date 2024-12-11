@@ -25,11 +25,13 @@ interface ICheckSplitter{
         uint256 contributionAmount        
     );
 
+    /// @dev Emitted when the remaining balance is transferred to the owner.
+    /// @param owner The address of the contract owner receiving the balance.
+    /// @param balance The amount of Ether transferred.
     event RemainingBalanceTransferred(
         address owner, 
         uint256 balance
     );
-
 
     /// @dev Registers a participant for check splitting.
     /// @param participant The address of the participant who is registering.
@@ -44,7 +46,6 @@ interface ICheckSplitter{
 
     /// @dev Allows a participant to contribute to the total.
     function contribute(uint256 amount) external payable ;
-
 
     /// @dev Transfer remaining balance to the owner after bill is finalized.
     function transferRemaining () external;
