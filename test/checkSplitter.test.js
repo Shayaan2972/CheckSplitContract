@@ -38,6 +38,72 @@ contract("CheckSplitter", (accounts) => {
     }
   });
 
+ it("should allow the owner to register participants", async () =>{
+    // Try reigstering participant
+    await checkSplitter.registerParticipant(participant1, {from: owner });
+
+    // Test for participant registration
+    const isRegistered = await checkSplitter.isParticipant(participant1);
+    assert.equal(isRegistered, true, "Participant was not registered.");
+
+  });
+
+  it("should not allow duplicate registration of a participant", async () =>{
+  // Reigster particpant
+  await checkSplitter.registerParticipant(participant1, {from: owner });
+
+  // Re-register participant and throw error if so
+    try{
+      await checkSplitter.registerParticipant(participant1, {from: owner });
+      assert.fail("An error due to double registration should have been thrown.")
+    } catch (error){
+      assert.include(error.message, "Participant already registered.")
+    }
+  });
+
+  it("should not allow registration of zero addresss", async () =>{
+    // Register invalid participant 
+    try{
+      await checkSplitter.registerParticipant(0x0000000000000000000000000000000000000000, {from: owner });
+      assert.fail("An error due to zero address should have been thrown.")
+    } catch (error){
+      assert.include(error.message, "Invalid participant address.")
+    }
+  });
+
+  it("should allow the owner to initialize bill", async () =>{
+    // Try initializaing bill
+    await checkSplitter.initializeBill(oneEth, {from: owner });
+
+    // Test for bill initialization
+    const totalBill = await checkSplitter.totalBill();
+    assert.equal(totalBill.toString(), oneEth, "The bill was not initialized.");
+
+  });
+
+  it("should not allow the bill to be initialized multiple times", async () =>{
+    // Try initializing bill
+    await checkSplitter.initializeBill(oneEth, {from: owner });
+  
+    // Re-initialize bill
+      try{
+        await checkSplitter.initializeBill(oneEth, {from: owner });
+        assert.fail("An error due to instantiating more than once should have been thrown.")
+      } catch (error){
+        assert.include(error.message, "Bill already initialized.")
+      }
+    });
+
+  it("should not allow bill to be initialized with an amount of 0", async () =>{
+    // Initialize bill with 0
+    try{
+      await checkSplitter.initializeBill("0", {from: owner });
+      assert.fail("An error due to instantiating with 0 eth should have been thrown.")
+    } catch (error){
+      assert.include(error.message, "Bill can not be initialized with 0 eth.")
+    }
+  });
+
   it("should allow participant to withdraw", async () => {
     await checkSplitter.registerParticipant(participant1, { from: owner });
     await checkSplitter.initializeBill(oneEth, { from: owner });
