@@ -19,12 +19,17 @@ contract CheckSplitter is ICheckSplitter {
 
     /// @notice Ensures only registered participants can call certain functions.
     modifier onlyParticipant() {
-        require(isParticipant[msg.sender], "You are not a registered participant.");
+        require(
+            isParticipant[msg.sender],
+            "You are not a registered participant."
+        );
         _;
     }
 
     // @inheritdoc ICheckSplitter
-    function registerParticipant(address participant) external override onlyOwner {
+    function registerParticipant(
+        address participant
+    ) external override onlyOwner {
         require(!isParticipant[participant], "Participant already registered.");
         require(participant != address(0), "Invalid participant address.");
 
@@ -41,9 +46,16 @@ contract CheckSplitter is ICheckSplitter {
     }
 
     /// @inheritdoc ICheckSplitter
+    /// @dev Allows a participant to withdraw a specified amount of Ether from their contribution.
+    /// @param amount The amount the participant wants to withdraw.
+    //  The withdrawal amount must be greater than zero and have enough contributed balance to withdraw the requested amount.
+    //  Will emit the withdrawal event
     function withdraw(uint256 amount) external override onlyParticipant {
         require(amount > 0, "Withdrawal amount must be greater than 0.");
-        require(shares[msg.sender] >= amount, "Insufficient balance to withdraw.");
+        require(
+            shares[msg.sender] >= amount,
+            "Insufficient balance to withdraw."
+        );
 
         shares[msg.sender] -= amount;
         payable(msg.sender).transfer(amount);
@@ -52,23 +64,31 @@ contract CheckSplitter is ICheckSplitter {
     }
 
     // @inheritdoc ICheckSplitter
-    function contribute(uint256 amount) external override payable onlyParticipant {
+    function contribute(
+        uint256 amount
+    ) external payable override onlyParticipant {
         require(billInitialized, "Bill has not been initialized yet.");
         require(amount > 0, "Contribution amount must be greater than 0.");
-        require(msg.value == amount, "Sent value does not match declared amount.");
-        
+        require(
+            msg.value == amount,
+            "Sent value does not match declared amount."
+        );
+
         // Calculate equal share per participant
         uint256 sharePerPerson = totalBill / participants.length;
-        
+
         // Get current participant's total contribution including this one
         uint256 totalContribution = shares[msg.sender] + amount;
-        
+
         // Ensure participant doesn't overpay their share
-        require(totalContribution <= sharePerPerson, "Cannot contribute more than your share.");
-        
+        require(
+            totalContribution <= sharePerPerson,
+            "Cannot contribute more than your share."
+        );
+
         // Update the participant's contribution
         shares[msg.sender] += amount;
-        
+
         // Emit the contribution event
         emit ContributionMade(msg.sender, amount);
     }
@@ -102,10 +122,17 @@ contract CheckSplitter is ICheckSplitter {
         emit RemainingBalanceTransferred(owner, contractBalance);
     }
 
-
-    function getParticipantDetails(address participant) external view returns ( uint256 amountPaid, bool hasPaid, uint256 amountOwed)
+    function getParticipantDetails(
+        address participant
+    )
+        external
+        view
+        returns (uint256 amountPaid, bool hasPaid, uint256 amountOwed)
     {
-        require(isParticipant[participant], "Address is not a registered participant.");
+        require(
+            isParticipant[participant],
+            "Address is not a registered participant."
+        );
 
         // Gets the amount paid by the participants
         amountPaid = shares[participant];
@@ -115,11 +142,9 @@ contract CheckSplitter is ICheckSplitter {
 
         // Calculates the share per person depening on the total and amount of participants
         uint256 sharePerPerson = totalBill / participants.length;
-        
-        amountOwed = sharePerPerson - amountPaid;
- 
-    }
 
+        amountOwed = sharePerPerson - amountPaid;
+    }
 
     /// @dev Allows the contract to receive Ether payments.
     receive() external payable {}
