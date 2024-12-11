@@ -53,10 +53,27 @@ contract CheckSplitter is ICheckSplitter {
         emit Withdrawal(msg.sender, amount);
     }
 
-    // Placeholder for `contribute` function 
-    // function contribute(uint256 amount) external payable override {
-    // 
-    // }
+    // @inheritdoc ICheckSplitter
+    function contribute(uint256 amount) external override payable onlyParticipant {
+        require(billInitialized, "Bill has not been initialized yet.");
+        require(amount > 0, "Contribution amount must be greater than 0.");
+        require(msg.value == amount, "Sent value does not match declared amount.");
+        
+        // Calculate equal share per participant
+        uint256 sharePerPerson = totalBill / participants.length;
+        
+        // Get current participant's total contribution including this one
+        uint256 totalContribution = shares[msg.sender] + amount;
+        
+        // Ensure participant doesn't overpay their share
+        require(totalContribution <= sharePerPerson, "Cannot contribute more than your share.");
+        
+        // Update the participant's contribution
+        shares[msg.sender] += amount;
+        
+        // Emit the contribution event
+        emit ContributionMade(msg.sender, amount);
+    }
 
     // Placeholder for `transferRemaining` function 
     // function transferRemaining() external override onlyOwner {
