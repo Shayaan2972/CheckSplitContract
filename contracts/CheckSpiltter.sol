@@ -25,9 +25,7 @@ contract CheckSplitter is ICheckSplitter {
 
     /// @notice Ensures only registered participants can call certain functions.
     modifier onlyParticipant() {
-        require(
-            isParticipant[msg.sender],
-            "You are not a registered participant.");
+        require(isParticipant[msg.sender], "You are not a registered participant.");
         _;
     }
 
@@ -85,9 +83,7 @@ contract CheckSplitter is ICheckSplitter {
         ) external payable override onlyParticipant {
             require(billInitialized, "Bill has not been initialized yet.");
             require(amount > 0, "Contribution amount must be greater than 0.");
-            require(
-                msg.value == amount,
-                "Sent value does not match declared amount."
+            require(msg.value == amount, "Sent value does not match declared amount."
             );
 
             // Calculate equal share per participant
