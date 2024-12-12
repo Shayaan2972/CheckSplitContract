@@ -86,16 +86,16 @@ contract CheckSplitter is ICheckSplitter {
             require(msg.value == amount, "Sent value does not match declared amount."
             );
 
-            // Calculate equal share per participant
-            uint256 sharePerPerson = totalBill / participants.length;
+            // Calculate share per person, rounding up to ensure no fraction is lost
+            uint256 sharePerPerson = (totalBill + participants.length - 1) / participants.length;
 
             // Get current participant's total contribution including this one
             uint256 totalContribution = shares[msg.sender] + amount;
 
-            // Ensure participant doesn't overpay their share
+            // Allow slight over-contribution to handle rounding
             require(
-                totalContribution <= sharePerPerson,
-                "Cannot contribute more than your share."
+                totalContribution <= sharePerPerson + (totalBill % participants.length),
+                "Cannot contribute more than your adjusted share."
             );
 
             // Update the participant's contribution
@@ -110,8 +110,8 @@ contract CheckSplitter is ICheckSplitter {
     function transferRemaining() external override onlyOwner {
         require(billInitialized, "Bill has not been initialized.");
 
-        // Calculate the share per participant
-        uint256 sharePerPerson = totalBill / participants.length;
+        // Calculate the share per participant, rounding up
+        uint256 sharePerPerson = (totalBill + participants.length - 1) / participants.length;
 
         // Verify all participants have contributed their full share
         for (uint256 i = 0; i < participants.length; i++) {
@@ -154,7 +154,7 @@ contract CheckSplitter is ICheckSplitter {
             amountPaid = shares[participant];
             hasPaid = amountPaid > 0;
 
-            uint256 sharePerPerson = totalBill / participants.length;
+            uint256 sharePerPerson = (totalBill + participants.length - 1) / participants.length;
             amountOwed = sharePerPerson - amountPaid;
         }
 

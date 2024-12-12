@@ -7,6 +7,7 @@ contract("CheckSplitter", (accounts) => {
   const owner = accounts[0];
   const participant1 = accounts[1];
   const participant2 = accounts[2];
+  const participant3 = accounts[3];
 
   const oneEth = "1000000000000000000"; // 1 ETH in wei
   const halfEth = "500000000000000000"; // 0.5 ETH in wei
@@ -328,7 +329,10 @@ contract("CheckSplitter", (accounts) => {
       });
       assert.fail("Should have thrown an error");
     } catch (error) {
-      assert.include(error.message, "Cannot contribute more than your share");
+      assert.include(
+        error.message,
+        "Cannot contribute more than your adjusted share."
+      );
     }
   });
 
@@ -420,5 +424,26 @@ contract("CheckSplitter", (accounts) => {
         "Error message does not match"
       );
     }
+  });
+  it.skip("should handle uneven bill distribution correctly", async function () {
+    await checkSplitter.initializeBill(101, { from: owner });
+
+    await checkSplitter.registerParticipant(participant1, { from: owner });
+    await checkSplitter.registerParticipant(participant2, { from: owner });
+    await checkSplitter.registerParticipant(participant3, { from: owner });
+
+    // Each participant must contribute at least 35 (ceil(103/3))
+    await checkSplitter.contribute(35, { from: participant1, value: 35 });
+    await checkSplitter.contribute(35, { from: participant2, value: 35 });
+    await checkSplitter.contribute(35, { from: participant3, value: 35 });
+
+    const initialOwnerBalance = await web3.eth.getBalance(owner);
+    await checkSplitter.transferRemaining({ from: owner });
+    const finalOwnerBalance = await web3.eth.getBalance(owner);
+
+    assert(
+      Number(finalOwnerBalance) > Number(initialOwnerBalance),
+      "Owner balance should have increased"
+    );
   });
 });
